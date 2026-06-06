@@ -55,27 +55,76 @@ means2004 <- digitize("means_2004.jpg")
 
 
 
+colnames(means2003) <- c("date", "weevils") 
+colnames(means2004) <- c("date", "weevils") 
 
 
+dates.2003 <- c("4/15/2003", "4/23/2003", "5/1/2003", "5/15/2003", "5/21/2003", 
+                "5/28/2003", "6/5/2003", "6/13/2003", "6/18/2003", "6/26/2003", 
+                "7/3/2003")
+
+means2003$date <- as.Date(dates.2003, "%m/%d/%Y")
+means2003$julian <- as.numeric(format(means2003$date, "%j"))
+
+means2003$DDs <- DDs_CSW2003[means2003$julian]
+
+means2003$props <- means2003$weevils / sum(means2003$weevils)
 
 
+dates.2004 <- c("4/29/2004", "5/6/2004", "5/14/2004", "5/18/2004", "5/28/2004", 
+                "6/4/2004", "6/10/2004", "6/18/2004", "6/25/2004", "7/1/2004", 
+                "7/9/2004")
 
+means2004$date <- as.Date(dates.2004, "%m/%d/%Y")
+means2004$julian <- as.numeric(format(means2004$date, "%j"))
 
+means2004$DDs <- DDs_CSW2004[means2004$julian]
 
+means2004$props <- means2004$weevils / sum(means2004$weevils)
 
-# Matching data collection days
+#######
 
-data_clean$NOW_DD <- rep(NA, length(data_clean$loc))
+plot(means2004$DDs, means2004$props, xlim = c(10, 400))
+points(means2003$DDs, means2003$props, col = "red")
 
+all.data <- rbind(means2003, means2004)
 
-for(i in 1: length(locations_NOW$loc)) {
-  data_clean$NOW_DD[which(data_clean$latitude == locations_NOW$latitude[i] & 
-                            data_clean$longitude == locations_NOW$longitude[i] &
-                            data_clean$year == locations_NOW$year[i])] <-
-    DDs_NOW[[i]][data_clean$julian[which(data_clean$latitude == 
-                                           locations_NOW$latitude[i] &
-                                           data_clean$longitude == 
-                                           locations_NOW$longitude[i] &
-                                           data_clean$year == 
-                                           locations_NOW$year[i])]]
+# Parameter estimation
+
+library(bbmle)
+
+CSW.DDs <- rep(all.data$DDs, round(all.data$weevils * 1000))
+
+MLL_CSW <- function(shape, scale) {
+  -sum(dweibull(x, shape = shape, scale = scale, log = TRUE))
 }
+
+mod_CSW <- mle2(MLL_CSW, start = list(shape = 3, scale  = 328), 
+                 data = list(x = CSW.DDs))
+summary(mod_CSW)
+
+hist(CSW.DDs)
+
+plot(all.data$DDs, all.data$props)
+lines(seq(50, 350), dweibull(seq(50, 350), shape = coef(mod_CSW)[1], scale = coef(mod_CSW)[2])*40)
+
+
+MLL_CSW1 <- function(shape, scale) {
+  -sum(dgamma(x, shape = shape, scale = scale, log = TRUE))
+}
+
+mod_CSW1 <- mle2(MLL_CSW1, start = list(shape = 3, scale  = 328), 
+                 data = list(x = CSW.DDs))
+
+summary(mod_CSW1)
+
+
+plot(all.data$DDs, all.data$props)
+lines(seq(50, 350), dgamma(seq(50, 350), shape = coef(mod_CSW1)[1], scale = coef(mod_CSW1)[2])*40)
+
+
+#######
+
+
+
+
