@@ -1,4 +1,4 @@
-# Retreive temp data for the locations reported in Ulmer & Dosdall (2006)
+# Retrieve temp data for the locations reported in Ulmer & Dosdall (2006)
 
 library(daymetr)
 
