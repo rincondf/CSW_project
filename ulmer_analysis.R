@@ -94,6 +94,8 @@ save(all.data, file = "CSWdata.RData")
 
 library(bbmle)
 
+load("CSWdata.RData")
+
 CSW.DDs <- rep(all.data$DDs, round(all.data$weevils * 1000))
 
 MLL_CSW <- function(shape, scale) {
