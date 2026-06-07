@@ -4,7 +4,7 @@ upT <- 50 # there is no upper threshold temp for crop development... for some re
 baseT <- 5 # based on Morrison et al. (1989)
 
 
-DDs_canola <- calc_dd_vec(tmax = 20, tmin = 20, 
+DDs_canola <- calc_dd_vec(tmax = rep(20, 28), tmin = rep(20, 28), 
                            lower_threshold = baseT, 
                            upper_threshold = upT, 
                            cutoff = "horizontal")
@@ -15,3 +15,53 @@ DDs_canola <- cumsum(DDs_canola)
 library(digitize)
 
 pods <- digitize("canola_pods.jpg")
+
+colnames(pods) <- c("DDs", "pods") 
+
+pods$DDs <- DDs_canola
+pods$props <- pods$pods / sum(pods$pods)
+pods <- rbind(data.frame(DDs = 0, pods = 0, props = 0), pods)
+
+plot(pods$DDs, pods$props)
+
+save(pods, file = "pods.RData")
+
+# Parameter estimation
+
+library(bbmle)
+
+load("pods.RData")
+
+pods.DDs <- rep(pods$DDs, round(pods$props * 1000))
+
+MLL_pods1 <- function(shape, scale) {
+  -sum(dweibull(x, shape = shape, scale = scale, log = TRUE))
+}
+
+mod_pods1 <- mle2(MLL_pods1, start = list(shape = 3, scale  = 328), 
+                  data = list(x = pods.DDs))
+
+summary(mod_pods1)
+
+
+plot(pods$DDs, pods$props)
+lines(seq(1, 350), dweibull(seq(1, 350), shape = coef(mod_pods1)[1], scale = coef(mod_pods1)[2])*15)
+
+################
+
+MLL_pods <- function(shape, scale) {
+  -sum(dgamma(x, shape = shape, scale = scale, log = TRUE))
+}
+
+mod_pods <- mle2(MLL_pods, start = list(shape = 3, scale  = 328), 
+                 data = list(x = pods.DDs))
+
+summary(mod_pods)
+
+
+plot(pods$DDs, pods$props)
+lines(seq(1, 350), dgamma(seq(1, 350), shape = coef(mod_pods)[1], scale = coef(mod_pods)[2])*15)
+
+
+
+#######

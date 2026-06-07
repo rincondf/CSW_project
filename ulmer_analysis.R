@@ -2,8 +2,6 @@
 
 library(daymetr)
 
-temp_recs <- list()
-
 temp_recs <- download_daymet(
   site = "Daymet",
   lat = 49.45,
@@ -89,6 +87,9 @@ points(means2003$DDs, means2003$props, col = "red")
 
 all.data <- rbind(means2003, means2004)
 
+save(all.data, file = "CSWdata.RData")
+
+
 # Parameter estimation
 
 library(bbmle)
@@ -122,6 +123,7 @@ summary(mod_CSW1)
 plot(all.data$DDs, all.data$props)
 lines(seq(50, 350), dgamma(seq(50, 350), shape = coef(mod_CSW1)[1], scale = coef(mod_CSW1)[2])*40)
 
+save(mod_CSW1, file = "CSWmodel.RData")
 
 #######
 
