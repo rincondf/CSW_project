@@ -1,6 +1,9 @@
 # Overlap between CSW and canola
 
-load("CSWmodel.RData", "canola_model.RData")
+load("CSWmodel.RData")
+load("canola_model.RData")
+
+library(bbmle)
 
 t_col <- function(color, percent = 50, name = NULL) {
   #      color = color name
@@ -50,5 +53,235 @@ axis(side = 3, at = seq(50, 400, 50), cex.axis = 2)
 polygon(seq(50, 400), dgamma(seq(50, 400), shape = coef(mod_CSW1)[1], 
                              scale = coef(mod_CSW1)[2])*50, col = CSWcol, border = NA)
 mtext("Cabbage seedpod weevil degree days", side = 3, cex = 2, line = 3)
+
+
+
+############
+
+
+weevils <- dgamma(seq(50, 400), shape = coef(mod_CSW1)[1], 
+                  scale = coef(mod_CSW1)[2])*7000000
+
+can_pods <- pgamma(seq(200, 700), shape = coef(mod_pods)[1], 
+                   scale = coef(mod_pods)[2])
+
+
+can_pods <- sample(can_pods, 351, replace = FALSE)
+can_pods <- can_pods[order(can_pods)]
+
+
+CSW_dam <- function(t) {
+  
+  res = 0
+  
+  pop <- weevils
+  
+  dama <- rep(NA, length(t))
+  dama[1] <- 0
+  
+  dama1 <- rep(NA, length(t))
+  dama1[1] <- 0
+  
+  apl <- 0
+  
+  for(i in 1: length(t)) {
+    dama[i+1] <- (pop[i] * 0.00264) * can_pods[i]
+    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 600)))
+    
+  }
+  
+  dama1
+  
+}
+
+
+
+plot(seq(50, 400), CSW_dam(seq(1, 350)), xlab = "Cabbage seedpod weevil degree days", 
+     ylab = "Cumulative yield loss per ha", cex.lab = 2, type = "l", 
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650))
+
+
+
+par(new = TRUE)
+plot(seq(50, 400), CSW_dam(seq(1, 350)), xlab = "", 
+     ylab = "", cex.lab = 2, type = "l", 
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650))
+
+
+
+###########
+
+f <- seq(50, 400)
+
+Canola_A <- function(x) {
+  
+  ires = 100
+  
+  t <- seq(1, 350)
+  
+  res <- rep(NA, length(x))
+  
+  pop <- weevils
+  
+  dama <- rep(NA, length(t))
+  dama[1] <- 0
+  
+  dama1 <- rep(NA, length(t))
+  dama1[1] <- 0
+  
+  x <- x - 49
+  
+  for(i in 1: length(t)) {
+    
+    if(i >= x & i <= (x + ires)) {
+      apl <- pop[x]
+      pop[i+1] <- 0.01 * apl
+    }
+    
+    
+    dama[i+1] <- (pop[i] * 0.00264) * can_pods[i]
+    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 600)))
+  }
+  
+  list(dama1[length(t)], sum(pop))
+  
+}
+
+SPLCanA <- rep(NA, length(f))
+
+for(i in 1: length(f)){
+  SPLCanA[i] <- Canola_A(f[i])[[1]]
+}
+
+SPLCanA[which.min(SPLCanA)]
+
+
+par(mar = c(4, 4, 2, 2))
+plot(f, SPLCanA, xlab = "Time (GDD)", 
+     ylab = "", cex.lab = 2, type = "l", 
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650))
+abline(h = SPLCanA[which.min(SPLCanA)], lty = 2)
+
+abline(v = which.min(SPLCanA) + 49, lty = 2)
+
+
+
+
+SPLCanB <- rep(NA, length(f))
+
+for(i in 1: length(f)){
+  SPLCanB[i] <- Canola_A(f[i])[[2]]
+}
+
+SPLCanB[which.min(SPLCanB)]
+
+
+par(mar = c(4, 4, 2, 2))
+plot(f, SPLCanB, xlab = "Time (GDD)", 
+     ylab = "", cex.lab = 2, type = "l", 
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 7000000))
+abline(h = SPLCanB[which.min(SPLCanB)], lty = 2)
+
+abline(v = which.min(SPLCanB) + 49, lty = 2)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Canola_B <- function(x) {
+  
+  ires = 100
+  
+  t <- seq(1, 350)
+  
+  res <- rep(NA, length(x))
+  
+  pop <- weevils
+  
+  dama <- rep(NA, length(t))
+  dama[1] <- 0
+  
+  dama1 <- rep(NA, length(t))
+  dama1[1] <- 0
+  
+  x <- x - 49
+  
+  for(i in 1: length(t)) {
+    
+    if(i >= x & i <= (x + ires)) {
+      apl <- pop[x]
+      pop[i+1] <- 0.01 * apl
+    }
+    
+    
+    dama[i+1] <- (pop[i] * 0.00264) * can_pods[i]
+    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 600)))
+  }
+  
+  pop
+  
+}
+
+par(new = TRUE)
+
+plot(f, Canola_B(which.min(SPLCanA) + 49), type = "l")
+lines(f, Canola_B(which.min(SPLCanB) + 49))
+
+
+
+
+
+
+
+Canola_C <- function(x) {
+  
+  ires = 100
+  
+  t <- seq(1, 350)
+  
+  res <- rep(NA, length(x))
+  
+  pop <- weevils
+  
+  dama <- rep(NA, length(t))
+  dama[1] <- 0
+  
+  dama1 <- rep(NA, length(t))
+  dama1[1] <- 0
+  
+  x <- x - 49
+  
+  for(i in 1: length(t)) {
+    
+    if(i >= x & i <= (x + ires)) {
+      apl <- pop[x]
+      pop[i+1] <- 0.01 * apl
+    }
+    
+    
+    dama[i+1] <- (pop[i] * 0.00264) * can_pods[i]
+    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 600)))
+  }
+  
+  dama1
+  
+}
+
+
+
+
+par(new = TRUE)
+plot(f, Canola_C(167), type = "l")
+plot(f, Canola_C(121), type = "l")
 
 
