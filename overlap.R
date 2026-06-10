@@ -31,7 +31,7 @@ App1col <- t_col("gold4", percent = 80)
 App2col <- t_col("blue3", percent = 80)
 
 
-par(mar = c(5, 7, 6, 2))
+par(mar = c(4.5, 6, 6, 2))
 
 plot(seq(200, 700), pgamma(seq(200, 700), shape = coef(mod_pods)[1], 
                          scale = coef(mod_pods)[2]), xlab = "", 
@@ -235,8 +235,8 @@ abline(v = which.min(SPLCanB) + 49, lty = 2)
 
 
 
-
-
+#######################
+#####################
 
 
 Canola_B <- function(x) {
