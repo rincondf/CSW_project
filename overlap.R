@@ -27,13 +27,20 @@ t_col <- function(color, percent = 50, name = NULL) {
 Cancol <- t_col("darkgreen", percent = 40)
 CSWcol <- t_col("brown", percent = 40)
 
+App1col <- t_col("gold4", percent = 80)
+App2col <- t_col("blue3", percent = 80)
+
 
 par(mar = c(5, 7, 6, 2))
 
 plot(seq(200, 700), pgamma(seq(200, 700), shape = coef(mod_pods)[1], 
-                         scale = coef(mod_pods)[2]), xlab = "Canola growing degree days", 
+                         scale = coef(mod_pods)[2]), xlab = "", 
      ylab = "", cex.lab = 2, type = "l", 
-     cex.axis = 2, lwd  = 2, xlim = c(200, 700), ylim = c(0, 1), yaxt = "n")
+     cex.axis = 2, lwd  = 2, xlim = c(200, 700), ylim = c(0, 1), yaxt = "n", xaxt = "n")
+
+
+mtext("Canola growing degree days", side = 1, cex = 2, line = 3, col = "darkgreen")
+axis(side = 1, at = seq(200, 700, 100), cex.axis = 2, col.axis = "darkgreen")
 
 axis(side = 2, at = seq(0, 1, 0.1), cex.axis = 2, las = 1)
 
@@ -49,12 +56,20 @@ plot(seq(50, 400), dgamma(seq(50, 400), shape = coef(mod_CSW1)[1],
      cex.axis = 2, lwd  = 2, ylim = c(0, 1), xlim = c(50, 400), yaxt = "n",
      xaxt = "n")
 
-axis(side = 3, at = seq(50, 400, 50), cex.axis = 2)
+axis(side = 3, at = seq(50, 400, 50), cex.axis = 2, col.axis = "brown")
 polygon(seq(50, 400), dgamma(seq(50, 400), shape = coef(mod_CSW1)[1], 
                              scale = coef(mod_CSW1)[2])*50, col = CSWcol, border = NA)
-mtext("Cabbage seedpod weevil degree days", side = 3, cex = 2, line = 3)
+mtext("Cabbage seedpod weevil degree days", side = 3, cex = 2, line = 3, col = "brown")
+
+#### ***RUN AFTER FINDING OPTIMUM TIMES***
 
 
+polygon(c((which.min(SPLCanA) + 49), (which.min(SPLCanA) + 49), (which.min(SPLCanA) + 49 + 100), 
+          (which.min(SPLCanA) + 49 + 100)), c(0, 1, 1, 0), col = App1col, border = NA)
+
+
+polygon(c((which.min(SPLCanB) + 49), (which.min(SPLCanB) + 49), (which.min(SPLCanB) + 49 + 100), 
+          (which.min(SPLCanB) + 49 + 100)), c(0, 1, 1, 0), col = App2col, border = NA)
 
 ############
 
@@ -65,6 +80,7 @@ weevils <- dgamma(seq(50, 400), shape = coef(mod_CSW1)[1],
 can_pods <- pgamma(seq(200, 700), shape = coef(mod_pods)[1], 
                    scale = coef(mod_pods)[2])
 
+# Making weevils and pods the same size
 
 can_pods <- sample(can_pods, 351, replace = FALSE)
 can_pods <- can_pods[order(can_pods)]
@@ -94,19 +110,14 @@ CSW_dam <- function(t) {
   
 }
 
-
+par(mar = c(5, 8, 3, 2))
 
 plot(seq(50, 400), CSW_dam(seq(1, 350)), xlab = "Cabbage seedpod weevil degree days", 
-     ylab = "Cumulative yield loss per ha", cex.lab = 2, type = "l", 
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650))
-
-
-
-par(new = TRUE)
-plot(seq(50, 400), CSW_dam(seq(1, 350)), xlab = "", 
      ylab = "", cex.lab = 2, type = "l", 
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650))
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650), yaxt = "n")
 
+axis(side = 2, at = seq(0, 600, 100), cex.axis = 2, las = 1)
+title(ylab = "Cumulative yield loss per ha (kg)", cex.lab = 2, line = 5)
 
 
 ###########
@@ -156,10 +167,22 @@ for(i in 1: length(f)){
 SPLCanA[which.min(SPLCanA)]
 
 
-par(mar = c(4, 4, 2, 2))
-plot(f, SPLCanA, xlab = "Time (GDD)", 
-     ylab = "", cex.lab = 2, type = "l", 
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650))
+par(mar = c(5, 7, 6, 2))
+plot(f, SPLCanA, xlab = "", 
+     ylab = "", cex.lab = 2, type = "l", col = "gold4",
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650), yaxt = "n",
+     xaxt = "n")
+
+axis(side = 2, at = seq(0, 600, 100), cex.axis = 2, las = 1)
+title(ylab = "Cumulative yield loss per ha (kg)", cex.lab = 2, line = 5)
+
+mtext("Canola growing degree days", side = 1, cex = 2, line = 3, col = "darkgreen")
+axis(side = 1, at = seq(50, 400, 70), labels = seq(200, 700, 100), cex.axis = 2, col.axis = "darkgreen")
+
+
+axis(side = 3, at = seq(50, 400, 50), cex.axis = 2, col.axis = "brown")
+mtext("Cabbage seedpod weevil degree days", side = 3, cex = 2, line = 3, col = "brown")
+
 abline(h = SPLCanA[which.min(SPLCanA)], lty = 2)
 
 abline(v = which.min(SPLCanA) + 49, lty = 2)
@@ -176,13 +199,31 @@ for(i in 1: length(f)){
 SPLCanB[which.min(SPLCanB)]
 
 
-par(mar = c(4, 4, 2, 2))
-plot(f, SPLCanB, xlab = "Time (GDD)", 
-     ylab = "", cex.lab = 2, type = "l", 
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 7000000))
+par(mar = c(5, 7, 6, 2))
+plot(f, SPLCanB, xlab = "", 
+     ylab = "", cex.lab = 2, type = "l", col = "blue3",
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 7000000), yaxt = "n",
+     xaxt = "n")
+
+axis(side = 2, at = c(0, 7000000), labels = c("0", "max"), cex.axis = 2, las = 1)
+title(ylab = "Cumulative pest population", cex.lab = 2, line = 5)
+
+mtext("Canola growing degree days", side = 1, cex = 2, line = 3, col = "darkgreen")
+axis(side = 1, at = seq(50, 400, 70), labels = seq(200, 700, 100), cex.axis = 2, col.axis = "darkgreen")
+
+
+axis(side = 3, at = seq(50, 400, 50), cex.axis = 2, col.axis = "brown")
+mtext("Cabbage seedpod weevil degree days", side = 3, cex = 2, line = 3, col = "brown")
+
 abline(h = SPLCanB[which.min(SPLCanB)], lty = 2)
 
 abline(v = which.min(SPLCanB) + 49, lty = 2)
+
+
+
+
+
+
 
 
 
