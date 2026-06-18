@@ -97,19 +97,29 @@ polygon(c((which.min(SPLCanA) + 49), (which.min(SPLCanA) + 49), (which.min(SPLCa
 polygon(c((which.min(SPLCanB) + 49), (which.min(SPLCanB) + 49), (which.min(SPLCanB) + 49 + 100), 
           (which.min(SPLCanB) + 49 + 100)), c(0, 1, 1, 0), col = App2col, border = NA)
 
+arrows((which.min(SPLCanA) + 49), 1.04, (which.min(SPLCanA) + 49), -0.04, 
+       col = "gold4", lwd = 2, code = 3, length = 0.1, xpd = NA)
+
+arrows((which.min(SPLCanB) + 49), 1.04, (which.min(SPLCanB) + 49), -0.04, 
+       col = "blue3", lwd = 2, code = 3, length = 0.1, xpd = NA)
+
+
 ############
 
 
 weevils <- dgamma(seq(50, 400), shape = coef(mod_CSW1)[1], 
-                  scale = coef(mod_CSW1)[2])*7000000
+                  scale = coef(mod_CSW1)[2])*7000
 
 can_pods <- pgamma(seq(200, 700), shape = coef(mod_pods)[1], 
                    scale = coef(mod_pods)[2])
 
-# Making weevils and pods the same size
 
-can_pods <- sample(can_pods, 351, replace = FALSE)
-can_pods <- can_pods[order(can_pods)]
+# Making weevil and and canola development the same size
+
+can_pods <- pgamma(((seq(50, 400) * 1.428) + 128.6), 
+                   shape = coef(mod_pods)[1], 
+                   scale = coef(mod_pods)[2])
+
 
 
 CSW_dam <- function(t) {
@@ -127,9 +137,8 @@ CSW_dam <- function(t) {
   apl <- 0
   
   for(i in 1: length(t)) {
-    dama[i+1] <- (pop[i] * 0.00264) * can_pods[i]
-    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 600)))
-    
+    dama[i+1] <- (pop[i] * 0.132) * can_pods[i]
+    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 40)))
   }
   
   dama1
@@ -140,9 +149,9 @@ par(mar = c(5, 8, 3, 2))
 
 plot(seq(50, 400), CSW_dam(seq(1, 350)), xlab = "Cabbage seedpod weevil degree days", 
      ylab = "", cex.lab = 2, type = "l", 
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650), yaxt = "n")
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 40), yaxt = "n")
 
-axis(side = 2, at = seq(0, 600, 100), cex.axis = 2, las = 1)
+axis(side = 2, at = seq(0, 40, 10), cex.axis = 2, las = 1)
 title(ylab = "Cumulative yield loss per ha (kg)", cex.lab = 2, line = 5)
 
 
@@ -176,8 +185,8 @@ Canola_A <- function(x) {
     }
     
     
-    dama[i+1] <- (pop[i] * 0.00264) * can_pods[i]
-    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 600)))
+    dama[i+1] <- (pop[i] * 0.132) * can_pods[i]
+    dama1[i+1] <- dama1[i] + (dama[i+1] * (1 - (dama1[i] / 40)))
   }
   
   list(dama1[length(t)], sum(pop))
@@ -196,11 +205,11 @@ SPLCanA[which.min(SPLCanA)]
 par(mar = c(5, 7, 6, 2))
 plot(f, SPLCanA, xlab = "", 
      ylab = "", cex.lab = 2, type = "l", col = "gold4",
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650), yaxt = "n",
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 40), yaxt = "n",
      xaxt = "n")
 
-axis(side = 2, at = seq(0, 600, 100), cex.axis = 2, las = 1)
-title(ylab = "Cumulative yield loss per ha (kg)", cex.lab = 2, line = 5)
+axis(side = 2, at = seq(0, 40, 10), cex.axis = 2, las = 1)
+title(ylab = "Cumulative yield loss (%)", cex.lab = 2, line = 5)
 
 mtext("Canola growing degree days", side = 1, cex = 2, line = 3, col = "darkgreen")
 axis(side = 1, at = seq(50, 400, 70), labels = seq(200, 700, 100), cex.axis = 2, col.axis = "darkgreen")
@@ -228,10 +237,10 @@ SPLCanB[which.min(SPLCanB)]
 par(mar = c(5, 7, 6, 2))
 plot(f, SPLCanB, xlab = "", 
      ylab = "", cex.lab = 2, type = "l", col = "blue3",
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 7000000), yaxt = "n",
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 7000), yaxt = "n",
      xaxt = "n")
 
-axis(side = 2, at = c(0, 7000000), labels = c("0", "max"), cex.axis = 2, las = 1)
+axis(side = 2, at = c(0, 7000), labels = c("0", "max"), cex.axis = 2, las = 1)
 title(ylab = "Cumulative pest population", cex.lab = 2, line = 5)
 
 mtext("Canola growing degree days", side = 1, cex = 2, line = 3, col = "darkgreen")

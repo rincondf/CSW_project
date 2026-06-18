@@ -46,19 +46,24 @@ polygon(c((which.min(SPLCanA) + 49), (which.min(SPLCanA) + 49), (which.min(SPLCa
 polygon(c((which.min(SPLCanB) + 49), (which.min(SPLCanB) + 49), (which.min(SPLCanB) + 49 + 100), 
           (which.min(SPLCanB) + 49 + 100)), c(0, 1, 1, 0), col = App2col, border = NA)
 
+arrows((which.min(SPLCanA) + 49), 1.04, (which.min(SPLCanA) + 49), -0.04, 
+       col = "gold4", lwd = 2, code = 3, length = 0.1, xpd = NA)
+
+arrows((which.min(SPLCanB) + 49), 1.04, (which.min(SPLCanB) + 49), -0.04, 
+       col = "blue3", lwd = 2, code = 3, length = 0.1, xpd = NA)
 
 # B
 
 par(mar = c(5, 7, 5.5, 2))
 plot(f, SPLCanA, xlab = "", 
      ylab = "", cex.lab = 2, type = "l", col = "gold4",
-     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 650), yaxt = "n",
+     cex.axis = 2, lwd  = 2, xlim = c(50, 400), ylim = c(0, 40), yaxt = "n",
      xaxt = "n")
 
 mtext("B", side = 3, cex = 2, at = 15, line = 3)
 
-axis(side = 2, at = seq(0, 600, 100), cex.axis = 1.5, las = 1)
-title(ylab = "Cumulative yield loss per ha (kg)", cex.lab = 1.5, line = 4.5)
+axis(side = 2, at = seq(0, 40, 10), cex.axis = 1.5, las = 1)
+title(ylab = "Cumulative yield loss (%)", cex.lab = 1.5, line = 4.5)
 
 mtext("Canola growing degree days", side = 1, cex = 1.5, line = 3, col = "darkgreen")
 axis(side = 1, at = seq(50, 400, 70), labels = seq(200, 700, 100), cex.axis = 1.5, col.axis = "darkgreen")
@@ -77,12 +82,12 @@ abline(v = which.min(SPLCanA) + 49, lty = 2)
 par(mar = c(5, 7, 5.5, 2))
 plot(f, SPLCanB, xlab = "", 
      ylab = "", cex.lab = 2, type = "l", col = "blue3",
-     cex.axis = 1.5, lwd  = 2, xlim = c(50, 400), ylim = c(0, 7000000), yaxt = "n",
+     cex.axis = 1.5, lwd  = 2, xlim = c(50, 400), ylim = c(0, 7000), yaxt = "n",
      xaxt = "n")
 
 mtext("C", side = 3, cex = 2, at = 15, line = 3)
 
-axis(side = 2, at = c(0, 7000000), labels = c("0", "max"), cex.axis = 1.5, las = 1)
+axis(side = 2, at = c(0, 7000), labels = c("0", "max"), cex.axis = 1.5, las = 1)
 title(ylab = "Cumulative pest population", cex.lab = 1.5, line = 4.5)
 
 mtext("Canola growing degree days", side = 1, cex = 1.5, line = 3, col = "darkgreen")
