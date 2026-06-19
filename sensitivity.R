@@ -1,3 +1,4 @@
+# POPULATION SIZE
 
 sensitA <- function(n){
   
@@ -75,6 +76,7 @@ plot(test_vals, t_dif)
 plot(test_vals, t_res)
 
 
+# DAMAGE COEFFICIENT
 
 sensitB <- function(d){
   
@@ -154,7 +156,7 @@ plot(test_valsB, t_resB)
 
 
 
-
+# INSECTICIDE EFFICACY
 
 
 sensitC <- function(ef){
@@ -234,7 +236,7 @@ plot(test_valsC, t_resC)
 
 
 
-
+# INSECTICIDE RESIDUAL TIME
 
 sensitD <- function(r){
   
@@ -313,7 +315,7 @@ plot(test_valsD, t_resD)
 
 
 
-
+# OVERLAP SIZE BETWEEN CROP AND PEST MODELS
 
 sensitE <- function(del){
   
